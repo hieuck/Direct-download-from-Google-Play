@@ -26,8 +26,8 @@
 // @connect      apkpremier.com
 // @connect      web-api.aptoide.com
 // @contributionURL https://buymeacoffee.com/stephenp_greasyfork
-// @downloadURL https://update.greasyfork.org/scripts/33005/Direct%20download%20from%20Google%20Play.user.js
-// @updateURL https://update.greasyfork.org/scripts/33005/Direct%20download%20from%20Google%20Play.meta.js
+// @downloadURL https://raw.githubusercontent.com/hieuck/Direct-download-from-Google-Play/refs/heads/main/Direct%20download%20from%20Google%20Play.js
+// @updateURL https://raw.githubusercontent.com/hieuck/Direct-download-from-Google-Play/refs/heads/main/Direct%20download%20from%20Google%20Play.js
 // ==/UserScript==
 var ui;
 var wlButton;
