@@ -2,7 +2,7 @@
 // @name         Direct download from Google Play
 // @name:it      Download diretto dal Google Play Store
 // @namespace    StephenP
-// @version      3.4.1
+// @version      3.4.2
 // @description  Adds APK-DL, APKPure, APKCombo, APKPremier, APKMirror and Evozi download buttons to Google Play Store when browsing apps.
 // @description:it  Aggiunge i tasti di download di APK-DL, APKPure, APKCombo, APKPremier, APKMirror e Evozi al Google Play Store quando si naviga tra le applicazioni.
 // @author       StephenP
