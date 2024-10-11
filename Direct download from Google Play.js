@@ -213,7 +213,7 @@ function addButtons(){
       var apkdlURL='http://apkfind.com/store/download?id='+id;
       var apkmirrorURL='https://www.apkmirror.com/?post_type=app_release&searchtype=apk&s='+id;
       var apkleecherURL='https://apkleecher.com/download/dl.php?dl='+id;
-      var apkcomboURL='https://apkcombo.com/genericApp/'+id+'/download/apk';
+      var apkcomboURL='https://apkcombo.com/vi/genericApp/'+id+'/download/apk';
       var apkpremierURL='https://apkpremier.com/download/'+id.toString().replace(/[.]/g,"-");
       var aptoideURL="https://web-api.aptoide.com/search?query="+id;
       wlButton = document.createDocumentFragment();
