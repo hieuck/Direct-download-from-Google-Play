@@ -441,79 +441,99 @@ function ddl(ddlButton,ddlURL){
         }
       }
     }
-  	else if (ddlURL.includes("apkcombo")) {
-        try {
-            var checkin;
-            
-            // Gửi POST request đến trang checkin của APKCombo để lấy thông tin cần thiết
-            GM.xmlHttpRequest({
-                method: "POST",
-                url: "https://apkcombo.com/checkin",
-                headers: {
-                    "Referer": ddlURL,
-                    "Origin": "https://apkcombo.com"
-                },
-                onload: function(response) {
-                    checkin = response.responseText;
-                    
-                    // Gửi GET request đến URL tải xuống APKCombo
-                    GM.xmlHttpRequest({
-                        method: "GET",
-                        url: ddlURL,
-                        onload: function(response) {
-                            switch (response.status) {
-                                case 410:
-                                    buttonError(ddlButton, "Removed!");
-                                    break;
-                                case 404:
-                                    buttonError(ddlButton, "Not found!");
-                                    break;
-                                default:
-                                    try {
-                                        var parser = new DOMParser();
-                                        var resp = parser.parseFromString(response.responseText, 'text/html');
-                                        var combo = resp.getElementsByClassName("file-list")[0];
-                                        
-                                        if (combo !== undefined) {
-                                            // Lấy danh sách các liên kết file APK
-                                            var combolinks = combo.getElementsByTagName("a");
-                                            for (var i = 0; i < combolinks.length; i++) {
-                                                let fileLink = combolinks[i].getAttribute("href");
-                                                if (fileLink.startsWith("/r2?u=")) {
-                                                    try {
-                                                        // Mở link tải xuống trực tiếp
-                                                        window.open(decodeURIComponent(fileLink).split("?u=")[1]);
-                                                    } catch (e) {
-                                                        console.log(e);
-                                                        buttonError(ddlButton, "Error!");
-                                                    }
-                                                } else {
-                                                    // Mở link với checkin token
-                                                    window.open(fileLink + "&" + checkin);
-                                                }
-                                            }
-                                            ddlButton.firstChild.textContent = "APKCombo";
-                                        } else {
-                                            buttonError(ddlButton, "No files available");
-                                        }
-                                    } catch (err) {
-                                        console.log(err);
-                                        buttonError(ddlButton, "Error!");
+  	else if(ddlURL.includes("apkcombo")){
+        try{
+          var checkin;
+          GM.xmlHttpRequest({
+            method: "POST",
+            url: "https://apkcombo.com/checkin",
+            headers: {
+              "Referer": ddlURL,
+              "Origin": "https://apkcombo.com"
+            },
+            onload: function(response) {
+              checkin=response.responseText;
+              GM.xmlHttpRequest({
+                  method: "GET",
+                  url: ddlURL,
+                  onload: function(response) {
+                    switch (response.status) {
+                        case 410:
+                            buttonError(ddlButton, "Removed!");
+                            break;
+                        case 404:
+                            buttonError(ddlButton, "Not found!");
+                            break;
+                        default:
+                            try {
+                                var i;
+                                var parser = new DOMParser();
+                                var resp = parser.parseFromString(response.responseText, 'text/html');
+                                var combo = resp.getElementsByClassName("file-list")[0];
+                                if (combo !== undefined){
+                                    var combolinks = combo.getElementsByTagName("a");
+                                    for (i = 0; i < combolinks.length; i++) {
+                                      let fileLink=combolinks[i].getAttribute("href");
+                                       if(fileLink.startsWith("/r2?u=")){
+                                         try{
+                                           window.open(decodeURIComponent(fileLink).split("?u=")[1]);
+                                         }
+                                         catch(e){
+                                           console.log(e);
+                                           buttonError(ddlButton, "Error!");
+                                         }
+                                       }
+                                      else{
+                                        window.open(fileLink+"&"+checkin);
+                                      }
                                     }
+                                    ddlButton.firstChild.textContent="APKCombo";
+                                }
+                                else{ //if loading the main download page results in an empty list of apks, tries to read the token to request directly the urls from apkcombo server
+                                      var tokenStart=response.responseText.indexOf("/dl?token=")+4;
+                                      var tokenEnd=response.responseText.indexOf("\"",tokenStart);
+                                      var token = response.responseText.substring(tokenStart,tokenEnd);
+                                      ddlURL=response.finalUrl;
+                                      GM.xmlHttpRequest({
+                                          method: "POST",
+                                          url: ddlURL.replace("/download/apk", "/dl")+"?"+token,
+                                          onload: function(response) {
+                                              var parser2 = new DOMParser();
+                                              var resp2 = parser2.parseFromString(response.responseText, 'text/html');
+                                              combo = resp2.getElementsByClassName("file-list")[0];
+                                              if (combo !== null) {
+                                                  var combolinks = combo.getElementsByTagName("a");
+                                                  for (i = 0; i < combolinks.length; i++) {
+                                                      window.open(combolinks[i].getAttribute("href")+"&"+checkin);
+                                                  }
+                                                	ddlButton.firstChild.textContent="APKCombo";
+                                              } else {
+                                                  ddlButton.firstChild.addEventListener("click",function(){window.open(ddlURL)});
+                                                  //ddlButton.firstChild.setAttribute("href", ddlURL);
+                                                  ddlButton.firstChild.textContent = "New tab >";
+                                                  ddlButton.onclick = null;
+                                              }
+                                          },
+                                          onerror: function(response) {
+                                              buttonError(ddlButton, "Error!");
+                                          }
+                                      });
+                                  }
+                            } catch (err) {
+                                console.log(err);
                             }
-                        },
-                        onerror: function() {
-                            buttonError(ddlButton, "Offline!");
-                        }
-                    });
+                    }
                 },
-                onerror: function() {
-                    buttonError(ddlButton, "Error!");
-                }
-            });
-        } catch (err) {
-            buttonError(ddlButton, "Failed!");
-            console.log(err);
+                  onerror: function(){
+                    buttonError(ddlButton,"Offline!");
+                  }
+              });
+            }
+          });
+        }
+        catch(err){
+          buttonError(ddlButton,"Failed!");
+          console.log(err);
         }
     }
   	else if(ddlURL.includes("apkpremier")){
